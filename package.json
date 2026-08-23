@@ -1,0 +1,16 @@
+{
+  "name": "last-mile-delivery-tracker-root",
+  "version": "1.0.0",
+  "description": "Last-Mile Delivery Tracker Full-Stack Application",
+  "scripts": {
+    "dev": "npx concurrently -n \"BACKEND,FRONTEND\" -c \"blue,cyan\" \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test",
+    "seed": "npm --prefix backend run db:seed",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

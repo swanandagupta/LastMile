@@ -1,0 +1,236 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-base: #050505;
+    --bg-surface: #0A0A0A;
+    --bg-panel: #111111;
+    --text-primary: #F4F7FB;
+    --text-secondary: #9BA6B8;
+    --text-muted: #667085;
+    --accent-yellow: #F5C518;
+    --accent-yellow-hover: #FFD43B;
+    --accent-purple: #C4B5FD;
+    --accent-purple-hover: #A78BFA;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    letter-spacing: -0.011em;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+/* ==========================================================================
+   1. AMBIENT MOVING GRADIENT FIELDS (Extremely Subtle Background)
+   ========================================================================== */
+.ambient-bg-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(160px);
+  will-change: transform, opacity;
+}
+
+.orb-yellow {
+  width: 600px;
+  height: 600px;
+  top: -150px;
+  left: 15%;
+  background: radial-gradient(circle, rgba(245, 197, 24, 0.05) 0%, transparent 70%);
+  animation: floatYellow 36s ease-in-out infinite alternate;
+}
+
+.orb-purple {
+  width: 550px;
+  height: 550px;
+  bottom: -100px;
+  right: 10%;
+  background: radial-gradient(circle, rgba(196, 181, 253, 0.04) 0%, transparent 70%);
+  animation: floatPurple 40s ease-in-out infinite alternate;
+}
+
+@keyframes floatYellow {
+  0% { transform: translate(0, 0); opacity: 0.6; }
+  100% { transform: translate(40px, 30px); opacity: 0.8; }
+}
+
+@keyframes floatPurple {
+  0% { transform: translate(0, 0); opacity: 0.6; }
+  100% { transform: translate(-30px, -40px); opacity: 0.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-orb {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   2. RESTRAINED GEIST-STYLE SURFACES & COMPACT CONTROLS
+   ========================================================================== */
+.ops-panel {
+  background: #0A0A0A;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+.ops-card {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ops-card:hover {
+  background: #141414;
+  border-color: rgba(245, 197, 24, 0.3);
+}
+
+.ops-input {
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  color: #F4F7FB;
+  font-size: 13px;
+  height: 38px;
+  padding: 0 12px;
+  line-height: 38px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ops-input::placeholder {
+  color: #667085;
+  opacity: 1;
+}
+
+.ops-input:hover {
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.ops-input:focus {
+  outline: none;
+  border-color: #F5C518;
+  box-shadow: 0 0 0 1px #F5C518;
+}
+
+.ops-btn-primary {
+  background: #F5C518;
+  color: #050505;
+  font-weight: 600;
+  font-size: 13px;
+  min-height: 38px;
+  border-radius: 6px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+}
+
+.ops-btn-primary:hover {
+  background: #FFD43B;
+}
+
+.ops-btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #F4F7FB;
+  font-weight: 500;
+  font-size: 13px;
+  min-height: 38px;
+  border-radius: 6px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ops-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.ops-btn-danger {
+  background: rgba(248, 113, 113, 0.10);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  color: #F87171;
+  font-weight: 600;
+  font-size: 13px;
+  min-height: 38px;
+  border-radius: 6px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1;
+  transition: background-color 0.15s ease;
+}
+
+.ops-btn-danger:hover {
+  background: rgba(248, 113, 113, 0.20);
+}
+
+.glass-modal {
+  background: #0A0A0A;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.9);
+}
+
+/* ==========================================================================
+   3. SUBTLE INTERACTION ANIMATIONS (150-200ms)
+   ========================================================================== */
+.fade-in {
+  animation: pageFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scale-in {
+  animation: dialogScaleIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes dialogScaleIn {
+  from { opacity: 0; transform: scale(0.99); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

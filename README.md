@@ -151,4 +151,5 @@ The **Last-Mile Delivery Tracker** is designed around zero hardcoding, strict re
 
 4. **Immutable Audit Timelines & Reschedule Workflows**: Immutability is enforced at the database and application layers. Order status changes write insert-only records to `OrderStatusHistory`, recording previous status, new status, timestamp, actor ID, role, and reason. When a delivery attempt fails, the order transitions to `FAILED` and deactivates the agent assignment. The customer's reschedule action creates a `RescheduleAttempt` record, resets the live status pointer to `BOOKED`, and re-invokes the assignment engine to dispatch a fresh delivery attempt.
 #   L a s t M i l e  
+ #   L a s t M i l e  
  

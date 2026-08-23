@@ -1,0 +1,209 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password_hash String
+  role          String   // CUSTOMER | AGENT | ADMIN
+  name          String
+  phone         String?
+  created_at    DateTime @default(now())
+
+  agent_profile        DeliveryAgent?
+  customer_orders      Order[]               @relation("CustomerOrders")
+  created_orders       Order[]               @relation("CreatedByOrders")
+  status_history_rows  OrderStatusHistory[]
+  assignments_given    AgentAssignment[]     @relation("AssignedByAdmin")
+  reschedule_requests  RescheduleAttempt[]
+  notifications        Notification[]
+
+  @@map("users")
+}
+
+model DeliveryAgent {
+  id           String   @id @default(uuid())
+  user_id      String   @unique
+  zone_id      String
+  latitude     Float?
+  longitude    Float?
+  is_available Boolean  @default(false)
+  is_active    Boolean  @default(true)
+
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  zone         Zone     @relation(fields: [zone_id], references: [id])
+  assignments  AgentAssignment[]
+  assigned_orders Order[] @relation("CurrentAgentOrders")
+
+  @@index([zone_id, is_available])
+  @@map("delivery_agents")
+}
+
+model Zone {
+  id   String @id @default(uuid())
+  name String @unique
+
+  areas          ZoneArea[]
+  agents         DeliveryAgent[]
+  pickup_orders  Order[]         @relation("PickupZoneOrders")
+  drop_orders    Order[]         @relation("DropZoneOrders")
+
+  @@map("zones")
+}
+
+model ZoneArea {
+  id      String  @id @default(uuid())
+  zone_id String
+  pincode String  @unique
+  city    String?
+
+  zone Zone @relation(fields: [zone_id], references: [id], onDelete: Cascade)
+
+  @@map("zone_areas")
+}
+
+model RateCard {
+  id            String   @id @default(uuid())
+  order_type    String   // B2B | B2C
+  zone_relation String   // INTRA | INTER
+  min_weight    Float
+  max_weight    Float?   // null means unbounded top slab
+  base_price    Float
+  rate_per_kg   Float
+
+  @@index([order_type, zone_relation])
+  @@map("rate_cards")
+}
+
+model CODConfig {
+  id             String @id @default(uuid())
+  order_type     String @unique // B2B | B2C
+  surcharge_type String // FLAT | PERCENTAGE
+  value          Float
+
+  @@map("cod_configs")
+}
+
+model Order {
+  id                    String    @id @default(uuid())
+  customer_id           String
+  created_by            String
+  pickup_line1          String
+  pickup_line2          String?
+  pickup_city           String
+  pickup_state          String
+  pickup_pincode        String
+  drop_line1            String
+  drop_line2            String?
+  drop_city             String
+  drop_state            String
+  drop_pincode          String
+  pickup_zone_id        String
+  drop_zone_id          String
+  pickup_latitude       Float?
+  pickup_longitude      Float?
+  length_cm             Float
+  breadth_cm            Float
+  height_cm             Float
+  actual_weight_kg      Float
+  volumetric_weight_kg  Float
+  chargeable_weight_kg  Float
+  order_type            String    // B2B | B2C
+  payment_type          String    // PREPAID | COD
+  base_charge           Float
+  cod_surcharge         Float     @default(0)
+  total_charge          Float
+  current_status        String    @default("BOOKED") // BOOKED | PICKED_UP | IN_TRANSIT | OUT_FOR_DELIVERY | DELIVERED | FAILED
+  current_agent_id      String?
+  scheduled_delivery_date String? // ISO date string YYYY-MM-DD
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  customer              User               @relation("CustomerOrders", fields: [customer_id], references: [id])
+  creator               User               @relation("CreatedByOrders", fields: [created_by], references: [id])
+  pickup_zone           Zone               @relation("PickupZoneOrders", fields: [pickup_zone_id], references: [id])
+  drop_zone             Zone               @relation("DropZoneOrders", fields: [drop_zone_id], references: [id])
+  current_agent         DeliveryAgent?     @relation("CurrentAgentOrders", fields: [current_agent_id], references: [id])
+
+  status_history        OrderStatusHistory[]
+  assignments           AgentAssignment[]
+  reschedule_attempts   RescheduleAttempt[]
+  notifications         Notification[]
+
+  @@index([current_status])
+  @@index([pickup_zone_id])
+  @@index([customer_id])
+  @@index([current_agent_id])
+  @@map("orders")
+}
+
+model OrderStatusHistory {
+  id              String   @id @default(uuid())
+  order_id        String
+  previous_status String?
+  new_status      String
+  changed_by      String
+  actor_role      String   // CUSTOMER | AGENT | ADMIN
+  reason          String?
+  created_at      DateTime @default(now())
+
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  actor User  @relation(fields: [changed_by], references: [id])
+
+  @@index([order_id, created_at])
+  @@map("order_status_history")
+}
+
+model AgentAssignment {
+  id              String    @id @default(uuid())
+  order_id        String
+  agent_id        String
+  assigned_by     String
+  assignment_type String    // AUTO | MANUAL
+  assigned_at     DateTime  @default(now())
+  unassigned_at   DateTime?
+  is_active       Boolean   @default(true)
+
+  order    Order         @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  agent    DeliveryAgent @relation(fields: [agent_id], references: [id])
+  assigner User          @relation("AssignedByAdmin", fields: [assigned_by], references: [id])
+
+  @@index([order_id, is_active])
+  @@map("agent_assignments")
+}
+
+model RescheduleAttempt {
+  id                      String   @id @default(uuid())
+  order_id                String
+  requested_by            String
+  previous_scheduled_date String?
+  new_scheduled_date      String
+  reason                  String?
+  created_at              DateTime @default(now())
+
+  order     Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  requester User  @relation(fields: [requested_by], references: [id])
+
+  @@map("reschedule_attempts")
+}
+
+model Notification {
+  id                String   @id @default(uuid())
+  order_id          String
+  recipient_user_id String
+  channel           String   // EMAIL | SMS
+  notif_type        String   // STATUS_CHANGE | ASSIGNMENT | RESCHEDULE
+  status            String   // SENT | FAILED
+  created_at        DateTime @default(now())
+
+  order     Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  recipient User  @relation(fields: [recipient_user_id], references: [id])
+
+  @@map("notifications")
+}
