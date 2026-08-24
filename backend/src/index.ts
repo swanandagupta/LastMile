@@ -35,8 +35,10 @@ app.use('/api/v1', adminRoutes);
 // Global Error Handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Last-Mile Delivery Tracker Backend running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Last-Mile Delivery Tracker Backend running on port ${PORT}`);
+  });
+}
 
 export default app;
