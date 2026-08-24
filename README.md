@@ -395,8 +395,8 @@ The engine queries `RateCard` matching `order_type` (`B2B` | `B2C`) and `zone_re
 $$\text{min\_weight} \le \text{Chargeable Weight} < \text{max\_weight} \quad (\text{or } \text{max\_weight} = \text{null})$$
 
 ### Step 6 — Base Freight Charge
-Base charge is calculated by applying base price plus extra weight rate per kg over minimum slab weight:
-$$\text{Base Charge} = \text{base\_price} + ((\text{Chargeable Weight} - \text{min\_weight}) \times \text{rate\_per\_kg})$$
+Base charge is calculated by applying base price plus rate per kg multiplied by chargeable weight:
+$$\text{Base Charge} = \text{base\_price} + (\text{rate\_per\_kg} \times \text{chargeable\_weight})$$
 
 ### Step 7 — COD Surcharge
 If `payment_type` is `COD`, surcharge is evaluated using `CODConfig` for `order_type`:
@@ -413,7 +413,7 @@ $$\text{Total Payable Charge} = \text{Base Charge} + \text{COD Surcharge}$$
 - **Chargeable Weight**: $\max(3.5, 4.8) = 4.8\text{ kg}$
 - **Zone Relation**: `INTER` (Cross-zone)
 - **Matched Rate Card**: Base Price = ₹100, Min Weight = $0\text{ kg}$, Rate/kg = ₹15
-- **Base Charge**: $100 + ((4.8 - 0) \times 15) = 100 + 72 = \text{₹}172.00$
+- **Base Charge**: $100 + (15 \times 4.8) = 100 + 72 = \text{₹}172.00$
 - **COD Surcharge (Configured at 11.6279% or Flat ₹20)**: ₹20.00
 - **Total Payable Charge**: $172 + 20 = \text{₹}192.00$
 
